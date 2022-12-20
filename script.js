@@ -1,6 +1,6 @@
 // VARIABLES
-var totalPixelesAncho, totalPixelesAlto, tamañoPixel = 10;
-var posSemaforo = [45,15];
+var totalPixelesAncho, totalPixelesAlto, tamañoPixel = 5;
+var posSemaforo = [100,40];
 var bordearDibujos = false, verRejilla = false;
 
 const canvas = document.getElementById("lienzo");
@@ -13,9 +13,9 @@ var canvasAncho = 1080, canvasAlto = 600;
 
 // Preguntar tamaño canvas
 while(false){
-    canvasAncho = parseInt(prompt("Ingresa el ancho del Canvas:\n(Anchura máxima: )"+window.innerWidth));
-    canvasAlto = parseInt(prompt("Ingresa el alto del Canvas:\n(Altura máxima: )"+window.innerHeight));
-
+    canvasAncho = parseInt(prompt("Ingresa el ancho del Canvas:\n(Anchura máxima: "+window.innerWidth+")"));
+    canvasAlto = parseInt(prompt("Ingresa el alto del Canvas:\n(Altura máxima: )"+window.innerHeight+")"));
+    tamañoPixel = parseInt(prompt("Ingresa el tamaño del Pixel:"));
     if(canvasAncho > window.innerWidth || canvasAncho <= 0){
         alert("El Ancho sobrepasa los límites, intente de nuevo.");
     } else if(canvasAlto > window.innerHeight || canvasAlto <= 0){
@@ -33,15 +33,28 @@ canvas.style.backgroundColor = "#1A1A1A";
 totalPixelesAlto = canvasAlto/tamañoPixel;
 totalPixelesAncho = canvasAncho/tamañoPixel;
 
+const botonRojo = document.getElementById('rojo');
+botonRojo.addEventListener('mousedown',function (){iluminarFoco(posSemaforo, "R");});
+botonRojo.addEventListener('mouseup',function (){limpiarCanvas(); semaforoApagado(posSemaforo);});
+const botonAmarillo = document.getElementById('amarillo');
+botonAmarillo.addEventListener('mousedown',function (){iluminarFoco(posSemaforo, "A");});
+botonAmarillo.addEventListener('mouseup',function (){limpiarCanvas(); semaforoApagado(posSemaforo);});
+const botonVerde = document.getElementById('verde');
+botonVerde.addEventListener('mousedown',function (){iluminarFoco(posSemaforo, "V");});
+botonVerde.addEventListener('mouseup',function (){limpiarCanvas(); semaforoApagado(posSemaforo);});
+
 function grid(){
     for(let i=0; i<totalPixelesAncho; i++){
         for(let j=0; j<totalPixelesAlto; j++){
-
             ctx.lineWidth = 0.2;
             ctx.strokeStyle = "black";
             ctx.strokeRect(i*tamañoPixel, j*tamañoPixel, tamañoPixel, tamañoPixel);
         }
     }
+}
+
+function limpiarCanvas(){
+    ctx.clearRect(0,0,canvasAncho,canvasAlto);
 }
 
 function pixelear(posInicial, cantidadPixeles, orientacion, color){
@@ -72,6 +85,7 @@ function bordear(posDibujo, limX, limY){
 }
 
 function semaforoApagado(pos){
+    console.log(posSemaforo);
     // Referencia: https://img.freepik.com/premium-vector/traffic-light-sign-pixel-art-style_475147-1256.jpg
     // Relleno
     pixelear([pos[0]+2, pos[1]+3], 23, "V", "#5E5E5E");
@@ -161,36 +175,57 @@ function semaforoApagado(pos){
     }
 }
 
-function iluminarRojo(pos){
-    pixelear([pos[0]+4, pos[1]+5], 3, "V", "#FF4B4B");
-    pixelear([pos[0]+5, pos[1]+4], 5, "V", "#FF4B4B");
-    pixelear([pos[0]+6, pos[1]+5], 4, "V", "#FF4B4B");
-    pixelear([pos[0]+7, pos[1]+6], 2, "V", "#FF4B4B");
-    pixelear([pos[0]+6, pos[1]+4], 1, "V", "#FF768C");
-    pixelear([pos[0]+7, pos[1]+4], 2, "V", "#FF768C");
-    pixelear([pos[0]+8, pos[1]+5], 3, "V", "#FF768C");
-    pixelear([pos[0]+7, pos[1]+8], 1, "V", "#FF768C");
+function iluminarFoco(pos, color){
+    let colorInterno1, colorInterno2, colorExterno1, colorExterno2, i;
+    switch (color) {
+        case "R":
+            i = 0;
+            colorInterno1 = "#FF4B4B"; colorInterno2 = "#FF768C";
+            colorExterno1 = "#A51F1F"; colorExterno2 = "#F36364";
+            break;
+        case "A":
+            i = 8;
+            colorInterno1 = "#F2FA1D"; colorInterno2 = "#FDFF8E";
+            colorExterno1 = "#E8B720"; colorExterno2 = "#91934E";
+            break;
+        case "V":
+            i = 16;
+            colorInterno1 = "#3ED43F"; colorInterno2 = "#82EC84";
+            colorExterno1 = "#1F8F1E"; colorExterno2 = "#629166";
+            break;
+    }
+    pixelear([pos[0]+4, pos[1]+5+i], 3, "V", colorInterno1);
+    pixelear([pos[0]+5, pos[1]+4+i], 5, "V", colorInterno1);
+    pixelear([pos[0]+6, pos[1]+5+i], 4, "V", colorInterno1);
+    pixelear([pos[0]+7, pos[1]+6+i], 2, "V", colorInterno1);
+    pixelear([pos[0]+6, pos[1]+4+i], 1, "V", colorInterno2);
+    pixelear([pos[0]+7, pos[1]+4+i], 2, "V", colorInterno2);
+    pixelear([pos[0]+8, pos[1]+5+i], 3, "V", colorInterno2);
+    pixelear([pos[0]+7, pos[1]+8+i], 1, "V", colorInterno2);
 
-    pixelear([pos[0]+5, pos[1]+3], 3, "H", "#811919");
-    pixelear([pos[0]+4, pos[1]+4], 1, "H", "#811919");
-    pixelear([pos[0]+3, pos[1]+5], 3, "V", "#811919");
-    pixelear([pos[0]+4, pos[1]+8], 1, "H", "#811919");
-    pixelear([pos[0]+5, pos[1]+9], 3, "H", "#811919");
-    pixelear([pos[0]+8, pos[1]+8], 1, "H", "#811919");
-    pixelear([pos[0]+9, pos[1]+5], 3, "V", "#811919");
-    pixelear([pos[0]+8, pos[1]+4], 1, "H", "#811919");
-
-    pixelear([pos[0]+3, pos[1]+8], 1, "H", "#DE6364");
-    pixelear([pos[0]+4, pos[1]+9], 1, "H", "#DE6364");
-    pixelear([pos[0]+5, pos[1]+10], 3, "H", "#DE6364");
-    pixelear([pos[0]+8, pos[1]+9], 1, "H", "#DE6364");
-    pixelear([pos[0]+9, pos[1]+8], 1, "H", "#DE6364");
+    pixelear([pos[0]+5, pos[1]+3+i], 3, "H", colorExterno1);
+    pixelear([pos[0]+4, pos[1]+4+i], 1, "H", colorExterno1);
+    pixelear([pos[0]+3, pos[1]+5+i], 3, "V", colorExterno1);
+    pixelear([pos[0]+4, pos[1]+8+i], 1, "H", colorExterno1);
+    pixelear([pos[0]+5, pos[1]+9+i], 3, "H", colorExterno1);
+    pixelear([pos[0]+8, pos[1]+8+i], 1, "H", colorExterno1);
+    pixelear([pos[0]+9, pos[1]+5+i], 3, "V", colorExterno1);
+    pixelear([pos[0]+8, pos[1]+4+i], 1, "H", colorExterno1);
+    pixelear([pos[0]+3, pos[1]+8+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+4, pos[1]+9+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+5, pos[1]+10+i], 3, "H", colorExterno2);
+    pixelear([pos[0]+8, pos[1]+9+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+9, pos[1]+8+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+10, pos[1]+5+i], 3, "V", colorExterno2);
+    pixelear([pos[0]+9, pos[1]+4+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+8, pos[1]+3+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+5, pos[1]+2+i], 3, "H", colorExterno2);
+    pixelear([pos[0]+4, pos[1]+3+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+3, pos[1]+4+i], 1, "H", colorExterno2);
+    pixelear([pos[0]+2, pos[1]+5+i], 3, "V", colorExterno2);
 }
 
 semaforoApagado(posSemaforo);
-const botonRojo = document.getElementById('rojo');
-botonRojo.addEventListener('mousedown',function (){iluminarRojo(posSemaforo);});
-botonRojo.addEventListener('mouseup',function (){semaforoApagado(posSemaforo);});
 
 
 if(verRejilla){

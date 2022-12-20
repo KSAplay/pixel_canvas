@@ -7,3 +7,11 @@ body{
     align-items: center;
     background-color:rgb(10, 10, 10);
 }
+
+.sliders{
+    width: 100%;
+}
+
+input{
+    margin: 5px 5px;
+}
